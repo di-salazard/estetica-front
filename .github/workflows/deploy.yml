@@ -31,5 +31,6 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist/estetica-front/browser
+          publish_branch: gh-pages  # Esto creará/actualizará esta rama específica
 
           
