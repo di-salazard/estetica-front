@@ -13,6 +13,11 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    # ESTA ES LA PARTE QUE FALTA:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v4
