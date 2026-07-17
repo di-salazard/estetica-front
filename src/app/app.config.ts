@@ -4,7 +4,7 @@ import { routes } from './app.routes'; // <-- Importa el archivo de arriba
 
 export const appConfig: ApplicationConfig = {
   providers: [
-  provideRouter(routes, withHashLocation()) 
+  provideRouter(routes)
 ] // <-- Enciende el enrutador
   
 };
