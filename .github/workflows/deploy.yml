@@ -27,8 +27,11 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Clean Install Dependencies
-        run: npm ci
+      - name: Install dependencies
+        run: |
+          rm -rf node_modules
+          rm package-lock.json
+          npm install
 
       - name: Verify builder
         run: ls node_modules/@angular-devkit/build-angular
