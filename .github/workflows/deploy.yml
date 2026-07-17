@@ -28,10 +28,7 @@ jobs:
           node-version: '22'
 
       - name: Install dependencies
-        run: |
-          rm -rf node_modules
-          rm package-lock.json
-          npm install
+        run: npm install --legacy-peer-deps
 
       - name: Verify builder
         run: ls node_modules/@angular-devkit/build-angular
