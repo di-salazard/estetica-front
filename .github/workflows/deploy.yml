@@ -24,7 +24,7 @@ jobs:
         run: npm install
 
       - name: Build
-        run: ng build --base-href "https://di-salazard.github.io/estetica-front/" --no-ssr --no-prerender
+        run: npx ng build --base-href "https://di-salazard.github.io/estetica-front/" --no-ssr --no-prerender
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
