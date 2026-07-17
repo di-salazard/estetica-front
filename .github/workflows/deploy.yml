@@ -27,8 +27,8 @@ jobs:
         with:
           node-version: '22'
 
-      - name: Install dependencies
-        run: npm install
+      - name: Clean Install Dependencies
+        run: npm ci  # npm ci es más seguro y rápido que npm install para entornos de CI/CD
 
       - name: Build
         run: npx ng build
