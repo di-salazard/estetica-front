@@ -1,0 +1,198 @@
+/* =========================================
+   1. SEPARADOR DORADO (Círculo y Líneas)
+   ========================================= */
+
+.separator-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 50px; /* Da espacio para que "respire" antes de las columnas */
+  position: relative;
+}
+
+/* El Círculo Dorado Central */
+.gold-separator {
+  width: 14px;
+  height: 14px;
+  background: radial-gradient(circle, var(--color-oro-claro) 0%, var(--color-oro-medio) 100%);
+  border-radius: 50%;
+  position: relative;
+  box-shadow: 0 0 10px rgba(230, 199, 134, 0.5); /* Resplandor */
+}
+
+/* Las Líneas (Pseudo-elementos) */
+.gold-separator::before,
+.gold-separator::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 1px;
+  width: 40vw; /* Ancho de la línea (40% de la pantalla) */
+}
+
+/* Línea IZQUIERDA */
+.gold-separator::before {
+  right: 20px; /* Separación del círculo */
+  background: linear-gradient(to right, transparent 0%, var(--color-oro-medio) 70%, var(--color-oro-claro) 100%);
+}
+
+/* Línea DERECHA */
+.gold-separator::after {
+  left: 20px; /* Separación del círculo */
+  background: linear-gradient(to right, var(--color-oro-claro) 0%, var(--color-oro-medio) 30%, transparent 100%);
+}
+
+
+/* =========================================
+   2. ESTILO BASE DEL FOOTER (Lujo Oscuro)
+   ========================================= */
+
+.luxury-footer {
+  background-color: var(--color-fondo-oscuro);
+  color: var(--color-texto-claro);
+  padding: 40px 0 20px; /* Reduje el padding de 60 a 40 porque el separador ya da espacio */
+  font-family: 'Arial', sans-serif;
+  overflow: hidden; /* Evita scroll horizontal por las líneas del separador */
+}
+
+
+/* =========================================
+   3. COLUMNAS Y CONTENIDO
+   ========================================= */
+
+/* Grid para las 4 columnas */
+.footer-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+/* Títulos de cada columna */
+.footer-column h3 {
+  color: var(--color-oro-medio);
+  font-size: 13px;
+  letter-spacing: 2px;
+  margin-bottom: 25px;
+  font-weight: 400;
+}
+
+/* Columna 1: Logo */
+.footer-logo {
+  max-width: 160px;
+}
+
+/* Columna 2: Enlaces */
+.links ul {
+  list-style: none;
+  padding: 0;
+}
+
+.links li {
+  margin-bottom: 15px;
+}
+
+.links a {
+  text-decoration: none;
+  color: var(--color-texto-claro);
+  font-size: 13px;
+  transition: color 0.3s ease;
+}
+
+.links a:hover {
+  color: var(--color-oro-claro);
+}
+
+/* Columna 3: Contacto y Horarios */
+.contact p {
+  font-size: 13px;
+  line-height: 1.6;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.contact i {
+  color: var(--color-oro-medio);
+  margin-top: 3px;
+}
+
+.hours ul {
+  list-style: disc;
+  padding-left: 30px;
+  margin-top: 5px;
+  font-size: 13px;
+}
+
+.hours li {
+  margin-bottom: 5px;
+}
+
+/* Columna 4: Formulario de Suscripción */
+.subscribe p {
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: 15px;
+}
+
+.subscribe-form {
+  display: flex;
+  border-bottom: 1px solid var(--color-texto-claro);
+  margin-bottom: 25px;
+  padding-bottom: 8px;
+}
+
+.subscribe-form input {
+  background: transparent;
+  border: none;
+  color: var(--color-texto-claro);
+  width: 100%;
+  outline: none;
+  font-size: 13px;
+}
+
+.subscribe-form button {
+  background: transparent;
+  border: none;
+  color: var(--color-texto-claro);
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.subscribe-form button:hover {
+  color: var(--color-oro-claro);
+}
+
+/* Redes Sociales */
+.social-icons {
+  display: flex;
+  gap: 20px;
+}
+
+.social-icons a {
+  color: var(--color-texto-claro);
+  font-size: 20px;
+  transition: color 0.3s ease;
+}
+
+.social-icons a:hover {
+  color: var(--color-oro-claro);
+}
+
+/* =========================================
+   4. PARTE INFERIOR (Copyright)
+   ========================================= */
+
+.footer-bottom {
+  text-align: center;
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05); /* Sutil línea separadora final */
+  font-size: 11px;
+  color: #777;
+}

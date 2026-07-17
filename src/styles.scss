@@ -1,0 +1,28 @@
+/* MODO OSCURO (Por defecto) */
+:root {
+  --color-fondo-oscuro: #151515; 
+  --color-oro-claro: #E6C786;
+  --color-oro-medio: #C5A059;
+  --color-bronce: #8B6533;
+  --color-texto-claro: #E0E0E0;
+}
+
+/* MODO CLARO (Se activa con el botón) */
+body.light-theme {
+  --color-fondo-oscuro: #FAFAFA; /* Cambiamos el fondo negro por Blanco Nieve */
+  --color-texto-claro: #333333;  /* Cambiamos el texto claro por un Gris Carbón Oscuro para que se lea */
+  /* Los colores dorados se mantienen igual porque combinan perfecto con el blanco */
+  /* NUEVAS VARIABLES PARA LA TARJETA EN MODO CLARO */
+  --color-fondo-tarjeta: #FFFFFF; /* Tarjeta completamente blanca */
+  --color-titulo-tarjeta: var(--color-oro-medio); /* Un dorado un poco más oscuro para que se lea mejor sobre blanco */
+}
+
+/* Resetea los márgenes y aplica el fondo dinámico */
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-fondo-oscuro); 
+  color: var(--color-texto-claro); /* Agregamos esto para que el texto cambie automáticamente */
+  min-height: 100vh;
+  transition: background-color 0.5s ease, color 0.5s ease; /* Hace que el cambio de color sea suave y animado */
+}

@@ -1,0 +1,18 @@
+<div class="card">
+  <div class="image-container">
+    <img [src]="tratamiento.imagen" [alt]="tratamiento.nombre">
+    
+    <div class="ribbon" *ngIf="tratamiento.conDescuento">
+      <span>TRATAMIENTO<br>CON DESCUENTO</span>
+    </div>
+  </div>
+
+  <div class="card-info">
+    <h3>{{ tratamiento.nombre }}</h3>
+    <p class="label">Precio Evaluación</p>
+    <div class="prices">
+      <span class="old-price" *ngIf="tratamiento.precioOriginal">${{ tratamiento.precioOriginal }}</span>
+      <span class="new-price">${{ tratamiento.precioDescuento }}</span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,22 @@
+<main class="home-body">
+  
+  <div class="section-header">
+    <h2 class="title">¿QUÉ ESTÁS BUSCANDO? <i class="fas fa-chevron-down"></i></h2>
+    
+    <div class="filter-box">
+      <select>
+        <option>Más vendidos</option>
+        <option>Menor precio</option>
+        <option>Mayor precio</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="catalog-grid">
+    <app-product-card 
+      *ngFor="let item of listaTratamientos" 
+      [tratamiento]="item">
+    </app-product-card>
+  </div>
+
+</main>

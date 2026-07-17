@@ -1,0 +1,57 @@
+.home-body {
+  padding: 60px 80px;
+  background-color: var(--color-fondo-oscuro); /* Negro Ébano de fondo */
+  min-height: 70vh; /* Asegura que ocupe buen espacio antes del footer */
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  padding-bottom: 15px;
+}
+
+.title {
+  color: var(--color-texto-claro);
+  font-size: 14px;
+  letter-spacing: 2px;
+  font-weight: 300;
+}
+
+.title i {
+  color: var(--color-oro-medio);
+  margin-left: 10px;
+}
+
+.filter-box select {
+  background-color: transparent;
+  color: var(--color-texto-claro);
+  border: 1px solid var(--color-bronce);
+  padding: 8px 15px;
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+}
+
+.filter-box select option {
+  background-color: var(--color-fondo-oscuro); /* Fondo oscuro al desplegar opciones */
+}
+
+/* Grid automático: se adapta al tamaño de la pantalla */
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 30px;
+}
+
+/* Estilos de la barra superior (ahora oscura con texto dorado) */
+.top-bar {
+  background-color: #111111; /* Un negro un poco más profundo para contrastar */
+  color: var(--color-oro-medio); /* Texto en oro clásico */
+  text-align: center;
+  padding: 8px 0;
+  font-size: 11px;
+  letter-spacing: 1.5px; /* Separar un poco las letras da un toque más "Premium" */
+}

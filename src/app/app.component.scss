@@ -1,0 +1,6 @@
+main {
+  /* Esto obliga al cuerpo a ocupar al menos el 80% del alto total de la pantalla de tu cliente */
+  min-height: 80vh; 
+  display: flex;
+  flex-direction: column;
+}

@@ -1,0 +1,110 @@
+/* Esto hace que el header se quede pegado arriba */
+.sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background-color: var(--color-fondo-oscuro); /* Fondo negro ébano elegante */
+  width: 100%;
+  overflow: hidden; /* Evita que las líneas doradas generen scroll horizontal */
+  /* NOTA: Eliminamos el border-bottom: 1px solid var(--color-bronce); de aquí */
+}
+
+.header-logo {
+  max-width: 100px;
+}
+
+/* Estilos para alinear el logo, el menú y los iconos */
+.main-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 50px 10px 50px; /* Reduje un poco el padding inferior (de 15px a 10px) para acercar el separador */
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+  gap: 25px;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: var(--color-texto-claro); 
+  font-weight: 300; 
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  transition: color 0.3s ease; 
+}
+
+.nav-links a:hover {
+  color: var(--color-oro-claro); 
+}
+
+/* Estilos para los iconos */
+.nav-icons {
+  display: flex;
+  gap: 20px;
+}
+
+.nav-icons a {
+  text-decoration: none; /* Quita el subrayado del enlace */
+}
+
+.nav-icons i {
+  color: var(--color-oro-medio);
+  font-size: 18px;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.nav-icons i:hover {
+  color: var(--color-oro-claro); 
+}
+
+
+/* =========================================
+   NUEVO SEPARADOR DORADO (Header)
+   ========================================= */
+
+/* Contenedor adaptado para el Header (sin tanto margen como en el Footer) */
+.separator-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  position: relative;
+  padding-bottom: 8px; /* Un pequeño respiro antes de que termine el Header */
+}
+
+/* El Círculo Dorado Central */
+.gold-separator {
+  width: 14px;
+  height: 14px;
+  background: radial-gradient(circle, var(--color-oro-claro) 0%, var(--color-oro-medio) 100%);
+  border-radius: 50%;
+  position: relative;
+  box-shadow: 0 0 10px rgba(230, 199, 134, 0.5); 
+}
+
+/* Las Líneas (Pseudo-elementos) */
+.gold-separator::before,
+.gold-separator::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 1px;
+  width: 45vw; /* Las líneas ocupan casi el 50% de la pantalla hacia cada lado */
+}
+
+/* Línea IZQUIERDA */
+.gold-separator::before {
+  right: 20px; 
+  background: linear-gradient(to right, transparent 0%, var(--color-oro-medio) 70%, var(--color-oro-claro) 100%);
+}
+
+/* Línea DERECHA */
+.gold-separator::after {
+  left: 20px; 
+  background: linear-gradient(to right, var(--color-oro-claro) 0%, var(--color-oro-medio) 30%, transparent 100%);
+}
