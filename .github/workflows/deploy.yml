@@ -37,7 +37,7 @@ jobs:
         run: ls node_modules/@angular-devkit/build-angular
 
       - name: Build
-        run: npx ng build
+        run: npx ng build --configuration production
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
