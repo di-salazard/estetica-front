@@ -1,0 +1,38 @@
+<div class="modal-overlay" (click)="cerrar()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    
+    <button class="close-btn" (click)="cerrar()">&times;</button>
+
+    <h2>{{ servicio?.titulo }}</h2>
+    <p>{{ servicio?.descripcionBase || servicio?.detalles || '' }}</p>
+
+    <div class="packages-list" *ngIf="servicio?.detalles && servicio.detalles.length > 0">
+      <h3>Selecciona un paquete:</h3>
+      
+      <div 
+        *ngFor="let paquete of servicio?.detalles"
+        class="package-item"
+        [class.selected]="paqueteSeleccionado?.id === paquete.id"
+        (click)="seleccionarPaquete(paquete)">
+        
+        <span>{{ paquete.nombrePaquete }} ({{ paquete.cantidadSesiones }} sesiones)</span>
+        
+        <div class="price-container">
+          <ng-container *ngIf="paquete.enOferta && paquete.precioOferta > 0; else precioNormal">
+            <span class="old-price">${{ paquete.precio | number:'1.0-0' }}</span>
+            <strong class="offer-price">${{ paquete.precioOferta | number:'1.0-0' }}</strong>
+          </ng-container>
+          
+          <ng-template #precioNormal>
+            <strong>${{ paquete.precio | number:'1.0-0' }}</strong>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+
+    <button class="action-btn" [disabled]="!paqueteSeleccionado" (click)="continuarAReserva()">
+      Elegir Fecha y Hora
+    </button>
+
+  </div>
+</div>

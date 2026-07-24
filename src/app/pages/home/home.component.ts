@@ -1,37 +1,67 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ProductCardComponent } from '../../shared/product-card/product-card.component'; // Importamos la tarjeta
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { CommonModule } from '@angular/common'; // <-- Necesario para el *ngFor y *ngIf
+import { ProductCardComponent } from '../../shared/product-card/product-card.component'; // <-- Tu tarjeta
+import { EsteticaService } from '../../core/services/estetica.service';
+import { Servicio } from '../../core/models/servicio.model';
+import { ConfirmModalComponent } from '../../shared/confirm-modal/confirm-modal.component'; // <-- 1. Import de la clase
+
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, ProductCardComponent], 
+  imports: [CommonModule, ProductCardComponent,ConfirmModalComponent], 
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss']
+  styleUrls: ['./home.component.scss'] // o .scss
 })
-export class HomeComponent {
-  // Simulamos los datos de la base de datos
-  listaTratamientos = [
-    {
-      nombre: 'Depilación láser',
-      precioOriginal: '20.000',
-      precioDescuento: '10.000',
-      imagen: 'assets/rostro.jpg', // ¡Asegúrate de poner una foto real en la carpeta public!
-      conDescuento: true
-    },
-    {
-      nombre: 'Tratamientos faciales profesionales',
-      precioOriginal: '20.000',
-      precioDescuento: '10.000',
-      imagen: 'assets/toxina.jpg',
-      conDescuento: true
-    },
-    {
-      nombre: 'Limpieza Facial Profunda',
-      precioOriginal: null, // No tiene descuento
-      precioDescuento: '25.000',
-      imagen: 'assets/limpieza.jpg',
-      conDescuento: false
+export class HomeComponent implements OnInit{
+
+  mostrarModal: boolean = false;
+  tratamientoSeleccionado: any = null;
+  listaTratamientos: Servicio[] = [];
+
+  // 2. Inyéctalo en el constructor
+  constructor(
+    private esteticaService: EsteticaService,
+    private cdr: ChangeDetectorRef 
+  ) {}
+
+  ngOnInit() {
+    this.esteticaService.obtenerServicios().subscribe({
+      next: (data) => {
+        // 3. Guardamos los datos y FORZAMOS el dibujado
+        console.log('Tratamientos obtenidos:', data);
+        this.listaTratamientos = data;
+        this.cdr.detectChanges(); // <--- ¡Esta es la línea mágica!
+      },
+      error: (error) => {
+        console.error('Error al obtener los tratamientos:', error);
+      }
+    }); 
+  }
+  
+
+  // === FUNCIONES DEL MODAL SIMPLIFICADAS ===
+  abrirModal(tratamientoId: number) {
+    if (tratamientoId !== null) {
+      this.esteticaService.obtenerServicioPorId(tratamientoId).subscribe({
+        next: (data) => {
+          this.tratamientoSeleccionado = data;
+          this.mostrarModal = true;
+          document.body.style.overflow = 'hidden';
+          
+          // ¡ESTA LÍNEA ES LA CLAVE! Despierta al HTML para que dibuje el modal
+          this.cdr.detectChanges(); 
+        },
+        error: (error) => {
+          console.error('Error al obtener el tratamiento:', error);
+        }
+      });
     }
-  ];
+  }
+
+  cerrarModal() {
+    this.mostrarModal = false;
+    this.tratamientoSeleccionado = null;
+    document.body.style.overflow = 'auto';
+  }
 }

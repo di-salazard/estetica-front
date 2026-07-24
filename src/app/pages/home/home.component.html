@@ -13,10 +13,19 @@
   </div>
 
   <div class="catalog-grid">
-    <app-product-card 
-      *ngFor="let item of listaTratamientos" 
-      [tratamiento]="item">
-    </app-product-card>
-  </div>
 
+    <app-product-card 
+      *ngFor="let tratamiento of listaTratamientos" 
+      [servicio]="tratamiento"
+      (click)="abrirModal(tratamiento.id)">
+    </app-product-card>
+
+  </div>
+  
+  <app-confirm-modal
+    *ngIf="mostrarModal"
+    [servicio]="tratamientoSeleccionado"
+    (cerrarModal)="cerrarModal()">
+</app-confirm-modal>
+  
 </main>

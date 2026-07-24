@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Servicio } from '../../core/models/servicio.model';
 
 @Component({
   selector: 'app-product-card',
@@ -9,6 +10,14 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./product-card.component.scss']
 })
 export class ProductCardComponent {
-  // Este @Input permite que el Home le envíe los datos de cada tratamiento a la tarjeta
-  @Input() tratamiento: any; 
+// ¡Aquí recibimos la data!
+  @Input() servicio!: Servicio;
+
+  // Función para sacar el precio del primer paquete y mostrarlo como "Desde $..."
+  get precioDesde(): number {
+    if (this.servicio && this.servicio.detalles && this.servicio.detalles.length > 0) {
+      return this.servicio.detalles[0].precio;
+    }
+    return 0;
+  }
 }
