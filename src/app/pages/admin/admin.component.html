@@ -1,0 +1,95 @@
+<div class="admin-container">
+  <header class="admin-header">
+    <h2>Panel de Administración - Clínica Estética</h2>
+    <button class="btn-salir" (click)="cerrarSesion()">Cerrar Sesión</button>
+  </header>
+
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <h3>Reservas para Hoy</h3>
+      <p class="metric-number">5</p>
+    </div>
+    <div class="metric-card">
+      <h3>Ingresos Estimados</h3>
+      <p class="metric-number">$450.000</p>
+    </div>
+    <div class="metric-card">
+      <h3>Servicios Activos</h3>
+      <p class="metric-number">3</p>
+    </div>
+  </div>
+
+  <div class="admin-content">
+    <div class="section-header">
+      <h3>Gestión de Servicios y Paquetes</h3>
+      <button class="btn-dorado" (click)="abrirFormularioNuevo()">+ Agregar Nuevo Servicio</button>
+    </div>
+
+    <div class="service-form-card" *ngIf="modoEdicion || creandoServicio">
+    <h4>{{ creandoServicio ? 'Registrar Nuevo Servicio' : 'Editar Servicio' }}</h4>
+    
+    <form (ngSubmit)="guardarServicio()">
+      <div class="form-group">
+        <label>Nombre del Servicio:</label>
+        <input type="text" [(ngModel)]="servicioActual.nombre" name="nombre" placeholder="Ej. Masajes Reductivos" required>
+      </div>
+
+      <div class="form-group">
+        <label>Descripción General:</label>
+        <textarea [(ngModel)]="servicioActual.descripcion" name="descripcion" placeholder="Ej. Incluyen masajes manuales, Maderoterapia..."></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Precio Normal ($):</label>
+          <input type="number" [(ngModel)]="servicioActual.precioNormal" name="precioNormal" required>
+        </div>
+        
+        <div class="form-group">
+          <label>¿Tiene Oferta?</label>
+          <select [(ngModel)]="servicioActual.tieneOferta" name="tieneOferta">
+            <option [ngValue]="false">No</option>
+            <option [ngValue]="true">Sí</option>
+          </select>
+        </div>
+        
+        <div class="form-group" *ngIf="servicioActual.tieneOferta">
+          <label>Precio Oferta ($):</label>
+          <input type="number" [(ngModel)]="servicioActual.precioOferta" name="precioOferta">
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn-guardar">Guardar en Base de Datos</button>
+        <button type="button" class="btn-cancelar" (click)="cerrarFormulario()">Cancelar</button>
+      </div>
+    </form>
+  </div>
+
+    <div class="table-responsive">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Oferta</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let s of servicios">
+            <td>{{ s.id }}</td>
+            <td>{{ s.titulo }}</td>
+            <td>{{ s.descripcionBase }}</td>
+            <td>{{ s.enOferta ? 'Sí' : 'No' }}</td>
+            <td>
+              <button class="btn-accion editar">Editar</button>
+              <button class="btn-accion detalle">+ Paquetes</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

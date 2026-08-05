@@ -1,14 +1,18 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { Servicio } from '../models/servicio.model';
+import { environment } from '../../../environments/environment.prod';
 
 @Injectable({
-  providedIn: 'root' // Esto hace que el servicio esté disponible en toda la aplicación
+  providedIn: 'root'
 })
 export class EsteticaService {
 
-  private apiUrl = 'http://localhost:8080/api/servicios'; // Cambia esto a la URL de tu API
-  private apiUrlDetalle = 'http://localhost:8080/api/servicios-detalle'; // Cambia esto a la URL de tu API para obtener por ID
+private apiUrl = `${environment.apiUrl}/servicios`;
+private apiUrlDetalle = `${environment.apiUrl}/servicios-detalle`;
+private apiUrlReserva = `${environment.apiUrl}/reservas`;
+
 
   constructor(private http: HttpClient) { }
 
@@ -24,5 +28,17 @@ export class EsteticaService {
   obtenerServicioDetallePorId(servicioId: number): Observable<any> {
     const url = `${this.apiUrlDetalle}/servicio/${servicioId}`;
     return this.http.get<any>(url);
+  }
+  crearServicio(servicio: Servicio): Observable<Servicio> {
+    const token = sessionStorage.getItem('authToken');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.post<Servicio>(this.apiUrl, servicio, { headers });
+  }
+
+  guardarReserva(reservaData: any): Observable<any> {
+    return this.http.post<any>(this.apiUrlReserva, reservaData);
   }
 }
