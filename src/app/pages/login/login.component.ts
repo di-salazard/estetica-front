@@ -23,7 +23,6 @@ export class LoginComponent {
 
     this.authService.login(credentials).subscribe({
       next: (response) => {
-        // Usamos sessionStorage para que el token muera al cerrar la pestaña
         sessionStorage.setItem('authToken', response.token);
         this.router.navigate(['/admin']);
       },

@@ -35,7 +35,14 @@
             "styles": [
               "src/styles.scss"
             ],
-            "baseHref": "https://di-salazard.github.io/estetica-front/"
+            "baseHref": "",
+            "allowedCommonJsDependencies": [
+              "@fullcalendar/core",
+              "@fullcalendar/angular",
+              "@fullcalendar/daygrid",
+              "@fullcalendar/timegrid",
+              "@fullcalendar/interaction",
+              "@fullcalendar/google-calendar"]
           },
           "configurations": {
             "production": {

@@ -1,16 +1,27 @@
-import { inject } from '@angular/core';
-import { Router, CanActivateFn } from '@angular/router';
+import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
+import { CanActivate, Router } from '@angular/router';
+import { isPlatformBrowser } from '@angular/common';
 
-export const authGuard: CanActivateFn = (route, state) => {
-  const router = inject(Router);
-  
-  // Verificamos el token en sessionStorage (se borra al cerrar la pestaña)
-  const token = sessionStorage.getItem('authToken');
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthGuard implements CanActivate {
 
-  if (token) {
-    return true;
-  } else {
-    router.navigate(['/login']); // Redirige al login si no hay sesión
+  constructor(
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object 
+  ) {}
+
+  canActivate(): boolean {
+    if (isPlatformBrowser(this.platformId)) {
+      const token = sessionStorage.getItem('authToken');
+
+      if (token) {
+        return true;
+      }
+    }
+
+    this.router.navigate(['/login']); 
     return false;
   }
-};
+}

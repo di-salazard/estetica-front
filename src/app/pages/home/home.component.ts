@@ -30,7 +30,8 @@ export class HomeComponent implements OnInit{
       next: (data) => {
         // 3. Guardamos los datos y FORZAMOS el dibujado
         console.log('Tratamientos obtenidos:', data);
-        this.listaTratamientos = data;
+        // Solo servicios activos (null cuenta como activo: servicios antiguos sin el campo)
+        this.listaTratamientos = (data || []).filter((s) => s.activo !== false);
         this.cdr.detectChanges(); // <--- ¡Esta es la línea mágica!
       },
       error: (error) => {

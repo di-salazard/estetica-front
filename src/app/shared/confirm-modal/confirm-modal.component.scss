@@ -35,6 +35,19 @@
     font-size: 0.95rem;
     margin-bottom: 20px;
   }
+
+  .duracion {
+    color: #d4af37;
+    font-size: 0.9rem;
+    margin-top: -10px;
+  }
+
+  /* Paso de reserva: más ancho y con scroll interno si no cabe */
+  &.modal-reserva {
+    max-width: 560px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
 }
 
 .close-btn {

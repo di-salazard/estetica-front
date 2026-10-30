@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './pages/home/home.component'; 
 import { AdminComponent } from './pages/admin/admin.component';
-import { authGuard } from './core/guards/auth.guard';
+import { AuthGuard } from './core/guards/auth.guard';
 import { LoginComponent } from './pages/login/login.component';
 
 export const routes: Routes = [
@@ -10,7 +10,7 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'admin', 
     component: AdminComponent, 
-    canActivate: [authGuard] // Protegido estrictamente por el guardián
+    canActivate: [AuthGuard] // Protegido estrictamente por el guardián
   },
   { path: '**', redirectTo: '', pathMatch: 'full' },
 

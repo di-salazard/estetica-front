@@ -4,18 +4,65 @@
     <button class="btn-salir" (click)="cerrarSesion()">Cerrar Sesión</button>
   </header>
 
+  <div class="calendar-wrapper">
+    <div #calendarContainer></div>
+  </div>
+
+  <div class="modal-overlay" *ngIf="citaSeleccionada" (click)="cerrarDetalleCita()">
+    <div class="service-form-card modal-content cita-modal" (click)="$event.stopPropagation()">
+      <button class="btn-cerrar-modal" (click)="cerrarDetalleCita()">✕</button>
+
+      <span class="cita-origen" [class.cita-origen-google]="citaSeleccionada.origen === 'google'">
+        {{ citaSeleccionada.origen === 'reserva' ? 'Reserva web' : 'Google Calendar' }}
+      </span>
+      <h4>{{ citaSeleccionada.titulo }}</h4>
+
+      <dl class="cita-datos">
+        <dt>Fecha</dt>
+        <dd>{{ citaSeleccionada.fecha }}</dd>
+        <dt>Horario</dt>
+        <dd>{{ citaSeleccionada.horario }}</dd>
+
+        <ng-container *ngIf="citaSeleccionada.origen === 'reserva'">
+          <dt>Cliente</dt>
+          <dd>
+            <ng-container *ngIf="citaSeleccionada.nombreCliente">{{ citaSeleccionada.nombreCliente }}<br></ng-container>
+            <a [href]="'mailto:' + citaSeleccionada.correoCliente">{{ citaSeleccionada.correoCliente }}</a>
+          </dd>
+          <dt>Teléfono</dt>
+          <dd>
+            {{ citaSeleccionada.whatsapp ? citaSeleccionada.telefono : 'Sin teléfono' }}
+            <a *ngIf="citaSeleccionada.whatsapp" [href]="citaSeleccionada.whatsapp" target="_blank" class="cita-whatsapp">
+              <i class="fa-brands fa-whatsapp"></i> WhatsApp
+            </a>
+          </dd>
+          <dt>Estado</dt>
+          <dd><span class="cita-estado">{{ citaSeleccionada.estado }}</span></dd>
+        </ng-container>
+      </dl>
+
+      <p class="cita-nota" *ngIf="citaSeleccionada.origen === 'google'">
+        Evento creado directamente en Google Calendar.
+      </p>
+
+      <div class="form-actions">
+        <button type="button" class="btn-cancelar" (click)="cerrarDetalleCita()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
   <div class="metrics-grid">
     <div class="metric-card">
       <h3>Reservas para Hoy</h3>
-      <p class="metric-number">5</p>
+      <p class="metric-number">{{ reservasHoy }}</p>
     </div>
     <div class="metric-card">
       <h3>Ingresos Estimados</h3>
-      <p class="metric-number">$450.000</p>
+      <p class="metric-number">${{ ingresosHoy.toLocaleString('es-CL') }}</p>
     </div>
     <div class="metric-card">
       <h3>Servicios Activos</h3>
-      <p class="metric-number">3</p>
+      <p class="metric-number">{{ serviciosActivos }}</p>
     </div>
   </div>
 
@@ -25,71 +72,122 @@
       <button class="btn-dorado" (click)="abrirFormularioNuevo()">+ Agregar Nuevo Servicio</button>
     </div>
 
-    <div class="service-form-card" *ngIf="modoEdicion || creandoServicio">
-    <h4>{{ creandoServicio ? 'Registrar Nuevo Servicio' : 'Editar Servicio' }}</h4>
-    
-    <form (ngSubmit)="guardarServicio()">
-      <div class="form-group">
-        <label>Nombre del Servicio:</label>
-        <input type="text" [(ngModel)]="servicioActual.nombre" name="nombre" placeholder="Ej. Masajes Reductivos" required>
-      </div>
+    <div class="modal-overlay" *ngIf="mostrarModal">
+      <div class="service-form-card modal-content">
+        <button class="btn-cerrar-modal" (click)="cerrarFormulario()">✕</button>
 
-      <div class="form-group">
-        <label>Descripción General:</label>
-        <textarea [(ngModel)]="servicioActual.descripcion" name="descripcion" placeholder="Ej. Incluyen masajes manuales, Maderoterapia..."></textarea>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label>Precio Normal ($):</label>
-          <input type="number" [(ngModel)]="servicioActual.precioNormal" name="precioNormal" required>
-        </div>
+        <h4>{{ creandoServicio ? 'Registrar Nuevo Servicio' : 'Editar Servicio' }}</h4>
         
-        <div class="form-group">
-          <label>¿Tiene Oferta?</label>
-          <select [(ngModel)]="servicioActual.tieneOferta" name="tieneOferta">
-            <option [ngValue]="false">No</option>
-            <option [ngValue]="true">Sí</option>
-          </select>
-        </div>
-        
-        <div class="form-group" *ngIf="servicioActual.tieneOferta">
-          <label>Precio Oferta ($):</label>
-          <input type="number" [(ngModel)]="servicioActual.precioOferta" name="precioOferta">
-        </div>
-      </div>
+        <form (ngSubmit)="guardarServicio()">
+          <div class="form-group">
+            <label>Nombre del Servicio:</label>
+            <input type="text" [(ngModel)]="servicioActual.titulo" name="titulo" placeholder="Ej. Masajes Reductivos" required>
+          </div>
 
-      <div class="form-actions">
-        <button type="submit" class="btn-guardar">Guardar en Base de Datos</button>
-        <button type="button" class="btn-cancelar" (click)="cerrarFormulario()">Cancelar</button>
-      </div>
-    </form>
-  </div>
+          <div class="form-group">
+            <label>Descripción General:</label>
+            <textarea [(ngModel)]="servicioActual.descripcionBase" name="descripcionBase" placeholder="Ej. Incluyen masajes manuales..."></textarea>
+          </div>
 
-    <div class="table-responsive">
+          <div class="form-row">
+            <div class="form-group">
+              <label>¿Tiene Oferta Base?</label>
+              <select [(ngModel)]="servicioActual.enOferta" name="enOferta">
+                <option [ngValue]="false">No</option>
+                <option [ngValue]="true">Sí</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Duración por sesión (minutos):</label>
+              <input type="number" [(ngModel)]="servicioActual.duracionMinutos" name="duracionMinutos" min="30" step="30" required>
+            </div>
+          </div>
+
+          <div class="detalles-section">
+            <div class="detalles-header">
+              <h5>Paquetes y Promociones</h5>
+              <button type="button" class="btn-agregar-paquete" (click)="agregarDetalle()">+ Agregar Paquete</button>
+            </div>
+
+            <div *ngIf="!servicioActual.detalles || servicioActual.detalles.length === 0" class="no-detalles">
+              <p>No se han agregado paquetes aún.</p>
+            </div>
+
+            <div class="paquete-card" *ngFor="let detalle of servicioActual.detalles; let i = index">
+              <div class="paquete-header">
+                <h6>Paquete #{{ i + 1 }}</h6>
+                <button type="button" class="btn-eliminar-paquete" (click)="eliminarDetalle(i)">✕ Eliminar</button>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Nombre del Paquete:</label>
+                  <input type="text" [(ngModel)]="detalle.nombrePaquete" [name]="'nombrePaquete_' + i" required>
+                </div>
+                <div class="form-group">
+                  <label>N° de Sesiones:</label>
+                  <input type="number" [(ngModel)]="detalle.cantidadSesiones" [name]="'cantidadSesiones_' + i" required>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Precio ($):</label>
+                  <input type="text" appFormatoMiles [(ngModel)]="detalle.precio" [name]="'precio_' + i" required>
+                </div>
+                <div class="form-group">
+                  <label>¿Oferta?</label>
+                  <select [(ngModel)]="detalle.enOferta" [name]="'enOferta_' + i">
+                    <option [ngValue]="false">No</option>
+                    <option [ngValue]="true">Sí</option>
+                  </select>
+                </div>
+                <div class="form-group" *ngIf="detalle.enOferta">
+                  <label>Precio Oferta ($):</label>
+                  <input type="text" appFormatoMiles [(ngModel)]="detalle.precioOferta" [name]="'precioOferta_' + i">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-guardar">{{ creandoServicio ? 'Guardar Servicio' : 'Actualizar Servicio' }}</button>
+            <button type="button" class="btn-cancelar" (click)="cerrarFormulario()">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div> <div class="table-responsive">
       <table class="admin-table">
         <thead>
           <tr>
             <th>ID</th>
             <th>Nombre</th>
             <th>Descripción</th>
+            <th>Duración</th>
             <th>Oferta</th>
+            <th>Estado</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let s of servicios">
+          <tr *ngFor="let s of servicios" [class.fila-inactiva]="s.activo === false">
             <td>{{ s.id }}</td>
             <td>{{ s.titulo }}</td>
             <td>{{ s.descripcionBase }}</td>
+            <td>{{ s.duracionMinutos ? s.duracionMinutos + ' min' : '—' }}</td>
             <td>{{ s.enOferta ? 'Sí' : 'No' }}</td>
             <td>
-              <button class="btn-accion editar">Editar</button>
-              <button class="btn-accion detalle">+ Paquetes</button>
+              <label class="switch-activo" [title]="s.activo === false ? 'Oculto en la página principal' : 'Visible en la página principal'">
+                <input type="checkbox" [checked]="s.activo !== false" (change)="cambiarActivo(s, $event)">
+                <span></span>
+                {{ s.activo === false ? 'Inactivo' : 'Activo' }}
+              </label>
+            </td>
+            <td>
+              <button class="btn-accion editar" (click)="abrirFormularioEditar(s)">Editar</button>
+              <button class="btn-accion eliminar" (click)="eliminarServicio(s.id)">Eliminar</button>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
-  </div>
-</div>

@@ -1,8 +1,13 @@
 export interface CrearReserva {
-	correo_cliente: string;
-	fecha_hora: string;
-	id_servicio_detalle: number;
-	telefono?: string;
-	correo?: string | null;
-	estado?: string;
+	nombreCliente: string;
+	correoCliente: string;
+	telefono: string;
+	fechaHora: string; // "2026-11-05T15:00:00", hora de Chile sin zona
+	idServicioDetalle: number;
+}
+
+export interface Disponibilidad {
+	fecha: string;
+	duracionMinutos: number;
+	horas: string[]; // horas de inicio libres, ej. ["10:00", "10:30"]
 }
