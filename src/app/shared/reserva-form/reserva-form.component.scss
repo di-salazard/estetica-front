@@ -54,13 +54,53 @@ h3 {
   }
 }
 
-.dias {
+/* Calendario a la izquierda y horas a la derecha; en pantallas chicas, uno debajo del otro */
+.agenda {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 24px;
+  margin-top: 18px;
+}
+
+.calendario-header {
   display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  padding-bottom: 6px;
-  scrollbar-color: #8b6533 transparent;
-  scrollbar-width: thin;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  color: #ddd;
+
+  button {
+    background: none;
+    border: 1px solid #444;
+    border-radius: 8px;
+    color: $oro;
+    width: 32px;
+    height: 32px;
+    font-size: 1.2rem;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.3;
+      cursor: default;
+    }
+  }
+}
+
+.calendario-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  text-align: center;
+}
+
+.dia-semana {
+  font-size: 11px;
+  color: #777;
+  padding-bottom: 4px;
+}
+
+.horas-panel h3 {
+  margin-top: 0;
 }
 
 .dia,
@@ -73,7 +113,7 @@ h3 {
   cursor: pointer;
   transition: all 0.2s ease;
 
-  &:hover {
+  &:hover:not(:disabled) {
     border-color: $oro;
   }
 
@@ -85,19 +125,15 @@ h3 {
 }
 
 .dia {
-  flex: 0 0 56px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 8px 0;
-  text-transform: capitalize;
+  aspect-ratio: 1;
+  padding: 0;
+  font-size: 0.9rem;
 
-  strong {
-    font-size: 1.15rem;
-  }
-
-  small {
-    font-size: 11px;
+  &:disabled {
+    background: transparent;
+    border-color: transparent;
+    color: #555;
+    cursor: default;
   }
 }
 
@@ -212,5 +248,11 @@ h3 {
   .nota {
     font-size: 14px;
     color: #888;
+  }
+}
+
+@media (max-width: 640px) {
+  .agenda {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

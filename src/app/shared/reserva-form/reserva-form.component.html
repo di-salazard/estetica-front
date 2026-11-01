@@ -20,34 +20,45 @@
     </strong>
   </div>
 
-  <!-- Día -->
-  <h3>Elige el día</h3>
-  <div class="dias">
-    <button type="button" *ngFor="let d of dias" class="dia"
-      [class.activo]="d.fecha === fechaSeleccionada"
-      (click)="seleccionarDia(d.fecha)">
-      <small>{{ d.diaSemana }}</small>
-      <strong>{{ d.dia }}</strong>
-      <small>{{ d.mes }}</small>
-    </button>
-  </div>
-
-  <!-- Hora -->
-  <ng-container *ngIf="fechaSeleccionada">
-    <h3>Elige la hora</h3>
-    <p class="aviso" *ngIf="cargandoHoras">Buscando horas disponibles...</p>
-    <p class="aviso error" *ngIf="errorHoras">{{ errorHoras }}</p>
-    <p class="aviso" *ngIf="!cargandoHoras && !errorHoras && horas.length === 0">
-      No quedan horas disponibles este día. Prueba con otro.
-    </p>
-    <div class="horas" *ngIf="!cargandoHoras && horas.length > 0">
-      <button type="button" *ngFor="let h of horas" class="hora"
-        [class.activo]="h === horaSeleccionada"
-        (click)="horaSeleccionada = h">
-        {{ h }}
-      </button>
+  <!-- Calendario a la izquierda, horas disponibles del día elegido a la derecha -->
+  <div class="agenda">
+    <div class="calendario">
+      <div class="calendario-header">
+        <button type="button" (click)="cambiarMes(-1)" [disabled]="!puedeRetroceder" aria-label="Mes anterior">‹</button>
+        <span>{{ nombreMes }}</span>
+        <button type="button" (click)="cambiarMes(1)" [disabled]="!puedeAvanzar" aria-label="Mes siguiente">›</button>
+      </div>
+      <div class="calendario-grid">
+        <span class="dia-semana" *ngFor="let d of diasSemana">{{ d }}</span>
+        <ng-container *ngFor="let c of celdas">
+          <span *ngIf="!c"></span>
+          <button type="button" *ngIf="c" class="dia"
+            [class.activo]="c.fecha === fechaSeleccionada"
+            [disabled]="!c.habilitado"
+            (click)="seleccionarDia(c.fecha)">
+            {{ c.dia }}
+          </button>
+        </ng-container>
+      </div>
     </div>
-  </ng-container>
+
+    <div class="horas-panel">
+      <h3>{{ fechaSeleccionada ? fechaLegible : 'Horas disponibles' }}</h3>
+      <p class="aviso" *ngIf="!fechaSeleccionada">Elige un día en el calendario para ver las horas disponibles.</p>
+      <p class="aviso" *ngIf="cargandoHoras">Buscando horas disponibles...</p>
+      <p class="aviso error" *ngIf="errorHoras">{{ errorHoras }}</p>
+      <p class="aviso" *ngIf="fechaSeleccionada && !cargandoHoras && !errorHoras && horas.length === 0">
+        No quedan horas disponibles este día. Prueba con otro.
+      </p>
+      <div class="horas" *ngIf="!cargandoHoras && horas.length > 0">
+        <button type="button" *ngFor="let h of horas" class="hora"
+          [class.activo]="h === horaSeleccionada"
+          (click)="horaSeleccionada = h">
+          {{ h }}
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Datos -->
   <form *ngIf="horaSeleccionada" #datosForm="ngForm" (ngSubmit)="confirmarReserva()" class="campos">

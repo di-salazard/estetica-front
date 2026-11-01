@@ -5,8 +5,8 @@ import { EsteticaService } from '../../core/services/estetica.service';
 import { Servicio } from '../../core/models/servicio.model';
 import { ServicioDetalle } from '../../core/models/servicio-detalle.model';
 
-// Días que se ofrecen para reservar (solo de lunes a viernes)
-const DIAS_HABILES_A_MOSTRAR = 15;
+// Meses hacia adelante que se pueden navegar en el calendario (además del actual)
+const MESES_ADELANTE = 2;
 
 // Paso de reserva dentro del modal del servicio: día, hora y datos de la clienta.
 // La reserva se guarda en la BD y el backend crea el evento en Google Calendar.
@@ -23,7 +23,10 @@ export class ReservaFormComponent implements OnInit {
   @Output() volver = new EventEmitter<void>();
   @Output() cerrar = new EventEmitter<void>();
 
-  dias: { fecha: string, diaSemana: string, dia: number, mes: string }[] = [];
+  // Calendario mensual: celdas de lunes a domingo; null = hueco antes del día 1
+  readonly diasSemana = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá', 'Do'];
+  mesVisible = new Date();
+  celdas: ({ fecha: string, dia: number, habilitado: boolean } | null)[] = [];
   fechaSeleccionada: string | null = null;
 
   horas: string[] = [];
@@ -42,7 +45,29 @@ export class ReservaFormComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.dias = this.proximosDiasHabiles();
+    const hoy = new Date();
+    this.mesVisible = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+    this.armarCalendario();
+  }
+
+  get nombreMes(): string {
+    const texto = this.mesVisible.toLocaleDateString('es-CL', { month: 'long', year: 'numeric' });
+    return texto.charAt(0).toUpperCase() + texto.slice(1);
+  }
+
+  get puedeRetroceder(): boolean {
+    const hoy = new Date();
+    return this.mesVisible > new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+  }
+
+  get puedeAvanzar(): boolean {
+    const hoy = new Date();
+    return this.mesVisible < new Date(hoy.getFullYear(), hoy.getMonth() + MESES_ADELANTE, 1);
+  }
+
+  cambiarMes(delta: number) {
+    this.mesVisible = new Date(this.mesVisible.getFullYear(), this.mesVisible.getMonth() + delta, 1);
+    this.armarCalendario();
   }
 
   get duracionMinutos(): number {
@@ -128,22 +153,26 @@ export class ReservaFormComponent implements OnInit {
     });
   }
 
-  private proximosDiasHabiles() {
-    const dias = [];
-    const fecha = new Date();
-    while (dias.length < DIAS_HABILES_A_MOSTRAR) {
-      const diaSemana = fecha.getDay();
-      if (diaSemana !== 0 && diaSemana !== 6) {
-        const p = (n: number) => String(n).padStart(2, '0');
-        dias.push({
-          fecha: `${fecha.getFullYear()}-${p(fecha.getMonth() + 1)}-${p(fecha.getDate())}`,
-          diaSemana: fecha.toLocaleDateString('es-CL', { weekday: 'short' }).replace('.', ''),
-          dia: fecha.getDate(),
-          mes: fecha.toLocaleDateString('es-CL', { month: 'short' }).replace('.', '')
-        });
-      }
-      fecha.setDate(fecha.getDate() + 1);
+  // Solo se pueden elegir días de lunes a viernes, desde hoy en adelante
+  private armarCalendario() {
+    const p = (n: number) => String(n).padStart(2, '0');
+    const anio = this.mesVisible.getFullYear();
+    const mes = this.mesVisible.getMonth();
+    const hoy = new Date();
+    const inicioHoy = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+    const diasDelMes = new Date(anio, mes + 1, 0).getDate();
+    // getDay(): domingo = 0; lo pasamos a lunes = 0
+    const huecos = (new Date(anio, mes, 1).getDay() + 6) % 7;
+
+    this.celdas = Array(huecos).fill(null);
+    for (let dia = 1; dia <= diasDelMes; dia++) {
+      const fecha = new Date(anio, mes, dia);
+      const finDeSemana = fecha.getDay() === 0 || fecha.getDay() === 6;
+      this.celdas.push({
+        fecha: `${anio}-${p(mes + 1)}-${p(dia)}`,
+        dia,
+        habilitado: !finDeSemana && fecha >= inicioHoy
+      });
     }
-    return dias;
   }
 }
