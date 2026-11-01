@@ -194,7 +194,8 @@ export class AdminComponent implements OnInit {
     });
   }
 
-  // Ingresos de hoy (solo reservas web, que tienen paquete y precio). El precio se busca en la lista de servicios ya cargada.
+  // Ingresos de hoy (solo reservas web). Se usa el precio guardado al reservar; las reservas antiguas
+  // (precio null) toman el precio actual de su paquete desde la lista de servicios ya cargada.
   private actualizarMetricas() {
     const paquetes = new Map<number, any>();
     this.servicios.forEach((servicio: any) => {
@@ -205,10 +206,15 @@ export class AdminComponent implements OnInit {
     this.ingresosHoy = 0;
 
     this.reservas.forEach((reserva) => {
-      // Las canceladas no suman. Si el paquete se eliminó (idServicioDetalle null) no hay precio para sumar.
+      // Las canceladas no suman
       if (reserva.estado === 'Cancelada' || new Date(reserva.fechaHora).toDateString() !== hoy) {
         return;
       }
+      if (reserva.precio != null) {
+        this.ingresosHoy += Number(reserva.precio) || 0;
+        return;
+      }
+      // Reserva antigua sin precio: si el paquete se eliminó (idServicioDetalle null) no hay precio para sumar
       const d = paquetes.get(reserva.idServicioDetalle);
       if (d) {
         this.ingresosHoy += Number(d.enOferta && d.precioOferta ? d.precioOferta : d.precio) || 0;
