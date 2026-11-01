@@ -6,6 +6,7 @@ import { EsteticaService } from '../../core/services/estetica.service';
 import { Servicio } from '../../core/models/servicio.model';
 import { ServicioDetalle } from '../../core/models/servicio-detalle.model';
 import { FormatoMilesDirective } from '../../shared/format/formato-miles.directive';
+import { urlImagen, prepararImagen, TAMANO_MAXIMO } from '../../core/utils/imagen';
 
 // Importaciones PURAS de FullCalendar (Sin el wrapper de Angular)
 // Bypass para ignorar el falso error de módulo de FullCalendar
@@ -29,10 +30,18 @@ export class AdminComponent implements OnInit {
   @ViewChild('calendarContainer', { static: false }) calendarContainer!: ElementRef;
   private calendar: any;
   servicios: Servicio[] = [];
-  reservas: any[] = [];
   reservasHoy: number = 0;
   ingresosHoy: number = 0;
+  // Ingresos de lo que se está viendo en el calendario (día, semana o mes)
+  ingresosRango: number = 0;
+  nombreRango = 'de la semana';
+  private eventosCargados: any[] = [];
   citaSeleccionada: any = null;
+  // Imagen elegida en el formulario (ya comprimida); se sube después de guardar el servicio
+  imagenNueva: Blob | null = null;
+  vistaPreviaImagen = '';
+  errorImagen = '';
+  procesandoImagen = false;
   mostrarModal: boolean = false;
   creandoServicio: boolean = false;
   modoEdicion: boolean = false;
@@ -52,7 +61,6 @@ export class AdminComponent implements OnInit {
 
   ngOnInit() {
     this.cargarServicios();
-    this.cargarReservas();
     this.cargarCitasHoy();
   }
 
@@ -63,14 +71,20 @@ export class AdminComponent implements OnInit {
   iniciarCalendario() {
     // Instanciamos el calendario directamente sobre el elemento HTML
     // (as any: los tipos de los plugins no se cargan por el @ts-ignore de los imports)
+    const celular = this.esCelular();
     this.calendar = new Calendar(this.calendarContainer.nativeElement, <any>{
-      initialView: 'timeGridWeek',
+      // En celular la semana no cabe: se parte en la vista de un día
+      initialView: celular ? 'timeGridDay' : 'timeGridWeek',
       plugins: [dayGridPlugin, timeGridPlugin],
       locale: esLocale,
-      headerToolbar: {
-        left: 'prev,next today',
-        center: 'title',
-        right: 'dayGridMonth,timeGridWeek,timeGridDay'
+      headerToolbar: this.barraCalendario(celular),
+      // Al girar el celular o cambiar el tamaño de la ventana se ajusta la vista
+      windowResize: () => {
+        const ahoraCelular = this.esCelular();
+        this.calendar.setOption('headerToolbar', this.barraCalendario(ahoraCelular));
+        if (ahoraCelular && this.calendar.view.type === 'timeGridWeek') {
+          this.calendar.changeView('timeGridDay');
+        }
       },
       slotMinTime: '08:00:00',
       slotMaxTime: '20:00:00',
@@ -85,11 +99,24 @@ export class AdminComponent implements OnInit {
       },
       // FullCalendar pide los eventos de la semana/mes visible cada vez que se navega
       events: (info: any, success: any, failure: any) => this.cargarEventosCalendario(info, success, failure),
+      // Al cambiar de vista o de fecha se recalculan los ingresos de lo visible
+      datesSet: () => this.actualizarIngresosRango(),
       eventClick: (info: any) => this.abrirDetalleCita(info.event)
     });
 
     // Le damos la orden de dibujarse
     this.calendar.render();
+  }
+
+  private esCelular(): boolean {
+    return window.innerWidth < 768;
+  }
+
+  // En celular no se ofrece la vista de semana (el título pasa a su propia línea por CSS)
+  private barraCalendario(celular: boolean) {
+    return celular
+      ? { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridDay' }
+      : { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay' };
   }
 
   // Reservas de la BD + eventos de Google Calendar, unificados por el backend
@@ -99,12 +126,16 @@ export class AdminComponent implements OnInit {
 
     this.servicioService.obtenerCalendario(desde, hasta).subscribe({
       next: (data) => {
-        success((data || []).map((evento) => {
+        this.eventosCargados = data || [];
+        this.actualizarIngresosRango();
+        success(this.eventosCargados.map((evento) => {
           const diaCompleto = evento.diaCompleto === true;
           return {
             id: evento.id,
-            // En las reservas web se antepone el nombre de la clienta (los eventos de Google ya lo traen en el título)
-            title: evento.nombreCliente ? `${evento.nombreCliente} - ${evento.titulo}` : evento.titulo,
+            // Se antepone el nombre de la clienta solo si el título de Google no lo trae ya
+            title: evento.nombreCliente && !evento.titulo.startsWith(evento.nombreCliente)
+              ? `${evento.nombreCliente} - ${evento.titulo}`
+              : evento.titulo,
             start: diaCompleto ? evento.inicio.substring(0, 10) : evento.inicio,
             end: diaCompleto ? evento.fin.substring(0, 10) : evento.fin,
             allDay: diaCompleto,
@@ -155,19 +186,6 @@ export class AdminComponent implements OnInit {
     return `https://wa.me/${numero.length === 9 ? '56' + numero : numero}`;
   }
 
-  cargarReservas() {
-    this.servicioService.obtenerReservas().subscribe({
-      next: (data) => {
-        this.reservas = data || [];
-        this.actualizarMetricas();
-      },
-      error: (err) => {
-        console.error('Error al cargar las reservas desde la API:', err);
-        this.manejarErrorSesion(err);
-      }
-    });
-  }
-
   // Si el token venció o no es válido, el backend responde 401: volvemos al login
   private manejarErrorSesion(err: any) {
     if (err?.status === 401) {
@@ -176,7 +194,9 @@ export class AdminComponent implements OnInit {
     }
   }
 
-  // Citas de hoy: reservas web + eventos de Google con hora (sin contar los de día completo, como feriados)
+  // Métricas de hoy con una sola petición al calendario (Google es la fuente de verdad):
+  // citas = eventos con hora (sin día completo, como feriados) que no estén cancelados;
+  // ingresos = precio de las reservas web (los eventos creados a mano en Google no tienen precio)
   cargarCitasHoy() {
     const fecha = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     const hoy = new Date();
@@ -184,7 +204,9 @@ export class AdminComponent implements OnInit {
 
     this.servicioService.obtenerCalendario(fecha(hoy), fecha(manana)).subscribe({
       next: (data) => {
-        this.reservasHoy = (data || []).filter((evento) => !evento.diaCompleto).length;
+        const citas = (data || []).filter((evento) => !evento.diaCompleto && evento.estado !== 'Cancelada');
+        this.reservasHoy = citas.length;
+        this.ingresosHoy = this.sumarIngresos(citas);
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -194,33 +216,26 @@ export class AdminComponent implements OnInit {
     });
   }
 
-  // Ingresos de hoy (solo reservas web). Se usa el precio guardado al reservar; las reservas antiguas
-  // (precio null) toman el precio actual de su paquete desde la lista de servicios ya cargada.
-  private actualizarMetricas() {
-    const paquetes = new Map<number, any>();
-    this.servicios.forEach((servicio: any) => {
-      (servicio.detalles || []).forEach((detalle: any) => paquetes.set(detalle.id, detalle));
+  private sumarIngresos(eventos: any[]): number {
+    return eventos
+      .filter((evento) => evento.estado !== 'Cancelada')
+      .reduce((total, evento) => total + (Number(evento.precio) || 0), 0);
+  }
+
+  // Ingresos de las citas dentro de lo que muestra el calendario (sin los días de relleno de la vista de mes)
+  private actualizarIngresosRango() {
+    if (!this.calendar) {
+      return;
+    }
+    const vista = this.calendar.view;
+    const nombres: any = { timeGridDay: 'del día', timeGridWeek: 'de la semana', dayGridMonth: 'del mes' };
+    this.nombreRango = nombres[vista.type] || 'del período';
+
+    const visibles = this.eventosCargados.filter((evento) => {
+      const inicio = new Date(evento.inicio);
+      return inicio >= vista.currentStart && inicio < vista.currentEnd;
     });
-
-    const hoy = new Date().toDateString();
-    this.ingresosHoy = 0;
-
-    this.reservas.forEach((reserva) => {
-      // Las canceladas no suman
-      if (reserva.estado === 'Cancelada' || new Date(reserva.fechaHora).toDateString() !== hoy) {
-        return;
-      }
-      if (reserva.precio != null) {
-        this.ingresosHoy += Number(reserva.precio) || 0;
-        return;
-      }
-      // Reserva antigua sin precio: si el paquete se eliminó (idServicioDetalle null) no hay precio para sumar
-      const d = paquetes.get(reserva.idServicioDetalle);
-      if (d) {
-        this.ingresosHoy += Number(d.enOferta && d.precioOferta ? d.precioOferta : d.precio) || 0;
-      }
-    });
-
+    this.ingresosRango = this.sumarIngresos(visibles);
     this.cdr.detectChanges();
   }
 
@@ -264,6 +279,7 @@ export class AdminComponent implements OnInit {
     this.modoEdicion = false;
     this.mostrarModal = true;
     this.bloquearScroll(true);
+    this.reiniciarImagen('');
     
     this.servicioActual = { 
       titulo: '', 
@@ -340,7 +356,7 @@ export class AdminComponent implements OnInit {
     this.servicioService.obtenerServicios().subscribe({
       next: (data) => {
         this.servicios = data;
-        this.actualizarMetricas();
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Error al cargar los servicios desde la API:', err);
@@ -358,6 +374,7 @@ export class AdminComponent implements OnInit {
     if (!this.servicioActual.detalles) {
       this.servicioActual.detalles = [];
     }
+    this.reiniciarImagen(urlImagen(servicio.imagenUrl));
   }
 
   cerrarFormulario() {
@@ -404,10 +421,21 @@ export class AdminComponent implements OnInit {
       : this.servicioService.actualizarServicio(s.id, payload);
 
     peticion.subscribe({
-      next: () => {
-        alert('¡Servicio guardado exitosamente en la base de datos!');
-        this.cargarServicios();
-        this.cerrarFormulario(); 
+      next: (guardado: any) => {
+        if (!this.imagenNueva) {
+          this.terminarGuardado('¡Servicio guardado exitosamente en la base de datos!');
+          return;
+        }
+        // Con el servicio ya guardado (y su id, si es nuevo) subimos la imagen
+        this.servicioService.subirImagenServicio(guardado?.id ?? s.id, this.imagenNueva).subscribe({
+          next: () => this.terminarGuardado('¡Servicio e imagen guardados exitosamente!'),
+          error: (err) => {
+            console.error('Error al subir la imagen:', err);
+            this.terminarGuardado(err.status === 400 || err.status === 413
+              ? 'El servicio se guardó, pero la imagen no es válida o pesa más de 10 MB. Prueba con otra foto.'
+              : 'El servicio se guardó, pero no se pudo subir la imagen. Intenta de nuevo editándolo.');
+          }
+        });
       },
       error: (err) => {
         console.error('Error al guardar el servicio:', err);
@@ -424,6 +452,48 @@ export class AdminComponent implements OnInit {
         }
       }
     });
+  }
+
+  private terminarGuardado(mensaje: string) {
+    alert(mensaje);
+    this.cargarServicios();
+    this.cerrarFormulario();
+  }
+
+  async elegirImagen(evento: Event) {
+    const input = evento.target as HTMLInputElement;
+    const archivo = input.files?.[0];
+    input.value = ''; // permite volver a elegir el mismo archivo
+    if (!archivo) {
+      return;
+    }
+    this.errorImagen = '';
+    try {
+      this.procesandoImagen = true;
+      this.cdr.detectChanges();
+      this.imagenNueva = await prepararImagen(archivo);
+      if (this.imagenNueva.size > TAMANO_MAXIMO) {
+        throw new Error('La imagen pesa más de 10 MB. Prueba con otra foto.');
+      }
+      if (this.vistaPreviaImagen.startsWith('blob:')) {
+        URL.revokeObjectURL(this.vistaPreviaImagen);
+      }
+      this.vistaPreviaImagen = URL.createObjectURL(this.imagenNueva);
+    } catch (e: any) {
+      this.imagenNueva = null;
+      this.errorImagen = e?.message || 'No se pudo leer la imagen.';
+    }
+    this.procesandoImagen = false;
+    this.cdr.detectChanges();
+  }
+
+  private reiniciarImagen(vistaPrevia: string) {
+    if (this.vistaPreviaImagen.startsWith('blob:')) {
+      URL.revokeObjectURL(this.vistaPreviaImagen);
+    }
+    this.imagenNueva = null;
+    this.vistaPreviaImagen = vistaPrevia;
+    this.errorImagen = '';
   }
 
   cerrarSesion() {

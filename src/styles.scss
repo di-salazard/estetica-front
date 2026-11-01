@@ -285,3 +285,169 @@ html, body {
 .admin-table tr.fila-inactiva td:not(:last-child):not(:nth-last-child(2)) {
   opacity: 0.45;
 }
+
+/* Subida de imagen en el formulario de servicio del admin
+   (va aquí por el budget de estilos del componente admin) */
+.imagen-servicio {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+
+  img {
+    width: 120px;
+    height: 80px;
+    object-fit: cover;
+    border: 1px solid #444;
+    border-radius: 6px;
+  }
+
+  > div {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  small {
+    color: #888;
+    font-size: 12px;
+  }
+
+  .aviso-imagen {
+    color: #e57373;
+  }
+}
+
+.btn-subir-imagen {
+  align-self: flex-start;
+  border: 1px solid var(--color-oro-medio, #C5A059);
+  color: var(--color-oro-claro, #E6C786) !important;
+  padding: 7px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px !important;
+  margin: 0 !important;
+
+  input {
+    display: none;
+  }
+
+  &:hover {
+    background: rgba(197, 160, 89, 0.15);
+  }
+}
+
+.btn-subir-imagen.deshabilitado {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* =========================================
+   PANEL ADMIN EN CELULAR Y TABLET
+   (va aquí por el budget de estilos del componente admin)
+   ========================================= */
+
+/* Fondo oscuro de los modales: cubre la ventana sin sumar el padding ni la barra de scroll al ancho */
+.modal-overlay {
+  box-sizing: border-box;
+  inset: 0;
+  width: auto !important;
+  height: auto !important;
+}
+
+/* La tabla de servicios se desplaza hacia el costado dentro de su caja, sin mover la página */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.admin-container .metrics-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr)) !important;
+}
+
+/* La barra del calendario pasa a varias líneas cuando no cabe */
+.calendar-wrapper .fc .fc-header-toolbar {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+@media (max-width: 768px) {
+  .admin-container {
+    padding: 20px 16px !important;
+
+    .admin-header {
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 25px !important;
+
+      h2 {
+        font-size: 1.25rem;
+        margin: 0;
+      }
+    }
+
+    .metrics-grid {
+      gap: 12px !important;
+      margin-bottom: 25px !important;
+    }
+
+    .admin-content {
+      padding: 16px !important;
+    }
+
+    .section-header {
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .admin-table th,
+    .admin-table td {
+      padding: 10px !important;
+      white-space: nowrap;
+    }
+
+    /* La descripción sí puede ocupar varias líneas */
+    .admin-table td:nth-child(3) {
+      white-space: normal;
+      min-width: 180px;
+    }
+  }
+
+  .calendar-wrapper {
+    padding: 12px !important;
+    margin-bottom: 25px;
+
+    .fc .fc-header-toolbar {
+      justify-content: space-between;
+    }
+
+    /* El título (fecha) arriba, en su propia línea */
+    .fc .fc-toolbar-chunk:nth-child(2) {
+      order: -1;
+      width: 100%;
+      text-align: center;
+    }
+
+    .fc .fc-toolbar-title {
+      font-size: 1.05rem !important;
+    }
+
+    .fc .fc-button {
+      padding: 4px 8px;
+      font-size: 0.85rem;
+    }
+  }
+
+  /* Modales del admin: casi a pantalla completa */
+  .admin-container .modal-overlay {
+    padding: 10px !important;
+  }
+
+  .admin-container .modal-content.service-form-card {
+    padding: 18px !important;
+  }
+
+  .imagen-servicio {
+    flex-wrap: wrap;
+  }
+}

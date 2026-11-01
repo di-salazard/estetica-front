@@ -42,11 +42,14 @@
     margin-top: -10px;
   }
 
-  /* Paso de reserva: más ancho y con scroll interno si no cabe */
+  /* Scroll interno si no cabe en la pantalla (celulares o muchos paquetes) */
+  max-height: 90vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+
+  /* Paso de reserva: más ancho */
   &.modal-reserva {
     max-width: 760px;
-    max-height: 90vh;
-    overflow-y: auto;
   }
 }
 
@@ -143,5 +146,17 @@
     background-color: #444;
     color: #888;
     cursor: not-allowed;
+  }
+}
+/* Celular: el modal aprovecha casi todo el ancho */
+@media (max-width: 480px) {
+  .modal-content {
+    width: 94%;
+    padding: 22px 16px;
+  }
+
+  .package-item {
+    padding: 10px 12px;
+    gap: 10px;
   }
 }

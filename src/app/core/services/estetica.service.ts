@@ -49,6 +49,18 @@ private apiUrlReserva = `${environment.apiUrl}/reservas`;
     return this.http.put<Servicio>(`${this.apiUrl}/${id}`, servicio, { headers });
   }
 
+  // Sube la imagen del servicio (se guarda en la BD); devuelve el servicio con su nueva imagenUrl
+  subirImagenServicio(id: number, imagen: Blob): Observable<Servicio> {
+    const token = sessionStorage.getItem('authToken');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    const datos = new FormData();
+    datos.append('archivo', imagen, 'imagen.jpg');
+
+    return this.http.post<Servicio>(`${this.apiUrl}/${id}/imagen`, datos, { headers });
+  }
+
   guardarReserva(reservaData: CrearReserva): Observable<any> {
     return this.http.post<any>(this.apiUrlReserva, reservaData);
   }

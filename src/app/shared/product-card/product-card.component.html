@@ -1,7 +1,7 @@
 <div class="card">
   <div class="image-container">
     
-    <img src="{{ servicio.imagenUrl }}" alt="{{ servicio?.titulo }}">
+    <img [src]="imagen" alt="{{ servicio?.titulo }}">
     
     <div class="ribbon" *ngIf="servicio?.enOferta">
       <span>TRATAMIENTO<br>CON DESCUENTO</span>

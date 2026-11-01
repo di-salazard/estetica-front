@@ -42,7 +42,8 @@
               "@fullcalendar/daygrid",
               "@fullcalendar/timegrid",
               "@fullcalendar/interaction",
-              "@fullcalendar/google-calendar"]
+              "@fullcalendar/google-calendar",
+              "heic2any"]
           },
           "configurations": {
             "production": {

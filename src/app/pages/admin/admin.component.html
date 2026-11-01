@@ -57,8 +57,12 @@
       <p class="metric-number">{{ reservasHoy }}</p>
     </div>
     <div class="metric-card">
-      <h3>Ingresos Estimados</h3>
+      <h3>Ingresos Estimados Hoy (solo reservas web)</h3>
       <p class="metric-number">${{ ingresosHoy.toLocaleString('es-CL') }}</p>
+    </div>
+    <div class="metric-card">
+      <h3>Ingresos {{ nombreRango }} (solo reservas web)</h3>
+      <p class="metric-number">${{ ingresosRango.toLocaleString('es-CL') }}</p>
     </div>
     <div class="metric-card">
       <h3>Servicios Activos</h3>
@@ -87,6 +91,22 @@
           <div class="form-group">
             <label>Descripción General:</label>
             <textarea [(ngModel)]="servicioActual.descripcionBase" name="descripcionBase" placeholder="Ej. Incluyen masajes manuales..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Imagen del servicio:</label>
+            <div class="imagen-servicio">
+              <img *ngIf="vistaPreviaImagen" [src]="vistaPreviaImagen" alt="Vista previa">
+              <div>
+                <label class="btn-subir-imagen" [class.deshabilitado]="procesandoImagen">
+                  {{ vistaPreviaImagen ? 'Cambiar imagen' : 'Subir imagen' }}
+                  <input type="file" accept="image/*,.heic,.heif" (change)="elegirImagen($event)">
+                </label>
+                <small *ngIf="!procesandoImagen">Cualquier foto (también de iPhone). Se ajusta automáticamente a un tamaño liviano.</small>
+                <small *ngIf="procesandoImagen">Preparando la imagen...</small>
+                <small class="aviso-imagen" *ngIf="errorImagen">{{ errorImagen }}</small>
+              </div>
+            </div>
           </div>
 
           <div class="form-row">
@@ -151,7 +171,7 @@
           </div>
 
           <div class="form-actions">
-            <button type="submit" class="btn-guardar">{{ creandoServicio ? 'Guardar Servicio' : 'Actualizar Servicio' }}</button>
+            <button type="submit" class="btn-guardar" [disabled]="procesandoImagen">{{ creandoServicio ? 'Guardar Servicio' : 'Actualizar Servicio' }}</button>
             <button type="button" class="btn-cancelar" (click)="cerrarFormulario()">Cancelar</button>
           </div>
         </form>
