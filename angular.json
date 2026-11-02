@@ -35,7 +35,7 @@
             "styles": [
               "src/styles.scss"
             ],
-            "baseHref": "",
+            "baseHref": "https://di-salazard.github.io/estetica-front/",
             "allowedCommonJsDependencies": [
               "@fullcalendar/core",
               "@fullcalendar/angular",
