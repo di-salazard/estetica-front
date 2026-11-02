@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Servicio } from '../models/servicio.model';
 import { CrearReserva, Disponibilidad } from '../models/reserva.model';
+import { Testimonio } from '../models/testimonio.model';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -13,6 +14,7 @@ export class EsteticaService {
 private apiUrl = `${environment.apiUrl}/servicios`;
 private apiUrlDetalle = `${environment.apiUrl}/servicios-detalle`;
 private apiUrlReserva = `${environment.apiUrl}/reservas`;
+private apiUrlTestimonios = `${environment.apiUrl}/testimonios`;
 
 
   constructor(private http: HttpClient) { }
@@ -98,5 +100,58 @@ private apiUrlReserva = `${environment.apiUrl}/reservas`;
     });
 
     return this.http.delete<void>(`${this.apiUrl}/${id}`, { headers });
+  }
+
+  // Público: fotos de clientas (casos reales), las más nuevas primero
+  obtenerTestimonios(): Observable<Testimonio[]> {
+    return this.http.get<Testimonio[]>(this.apiUrlTestimonios);
+  }
+
+  crearTestimonio(imagen: Blob, titulo: string, descripcion: string): Observable<Testimonio> {
+    const token = sessionStorage.getItem('authToken');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    const datos = new FormData();
+    datos.append('archivo', imagen, 'imagen.jpg');
+    if (titulo.trim()) {
+      datos.append('titulo', titulo.trim());
+    }
+    if (descripcion.trim()) {
+      datos.append('descripcion', descripcion.trim());
+    }
+
+    return this.http.post<Testimonio>(this.apiUrlTestimonios, datos, { headers });
+  }
+
+  // Solo cambia los textos (vacío = sin título / sin descripción)
+  actualizarTestimonio(id: number, titulo: string, descripcion: string): Observable<Testimonio> {
+    const token = sessionStorage.getItem('authToken');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.put<Testimonio>(`${this.apiUrlTestimonios}/${id}`,
+      { titulo: titulo.trim() || null, descripcion: descripcion.trim() || null }, { headers });
+  }
+
+  cambiarImagenTestimonio(id: number, imagen: Blob): Observable<Testimonio> {
+    const token = sessionStorage.getItem('authToken');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    const datos = new FormData();
+    datos.append('archivo', imagen, 'imagen.jpg');
+
+    return this.http.post<Testimonio>(`${this.apiUrlTestimonios}/${id}/imagen`, datos, { headers });
+  }
+
+  eliminarTestimonio(id: number): Observable<void> {
+    const token = sessionStorage.getItem('authToken');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.delete<void>(`${this.apiUrlTestimonios}/${id}`, { headers });
   }
 }

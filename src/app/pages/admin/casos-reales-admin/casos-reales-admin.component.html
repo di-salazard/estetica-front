@@ -1,0 +1,66 @@
+<div class="casos-admin">
+  <div class="casos-header">
+    <div>
+      <h3>Casos Reales</h3>
+      <small>Fotos de clientas que se muestran en el botón flotante "Casos reales" de la página principal.</small>
+    </div>
+    <button class="btn-dorado" (click)="abrirNuevo()">+ Agregar Foto</button>
+  </div>
+
+  <p class="casos-vacio" *ngIf="testimonios.length === 0">
+    Aún no hay fotos. Mientras no haya ninguna, el botón no aparece en la página.
+  </p>
+
+  <div class="casos-grid">
+    <div class="caso" *ngFor="let t of testimonios">
+      <img [src]="url(t)" [alt]="t.titulo || 'Caso real'" loading="lazy">
+      <div class="caso-texto">
+        <strong>{{ t.titulo || 'Sin título' }}</strong>
+        <p *ngIf="t.descripcion">{{ t.descripcion }}</p>
+      </div>
+      <div class="caso-acciones">
+        <button class="btn-editar" (click)="abrirEditar(t)">Editar</button>
+        <button class="btn-eliminar" (click)="eliminar(t)">Eliminar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay casos-overlay" *ngIf="mostrarFormulario" (click)="cerrarFormulario()">
+  <div class="casos-modal" (click)="$event.stopPropagation()">
+    <button class="btn-cerrar" (click)="cerrarFormulario()">✕</button>
+    <h4>{{ editando ? 'Editar Caso Real' : 'Nuevo Caso Real' }}</h4>
+
+    <form (ngSubmit)="guardar()">
+      <label>Foto:</label>
+      <div class="foto-campo">
+        <img *ngIf="vistaPrevia" [src]="vistaPrevia" alt="Vista previa">
+        <div>
+          <label class="btn-subir-imagen" [class.deshabilitado]="procesandoImagen">
+            {{ vistaPrevia ? 'Cambiar foto' : 'Subir foto' }}
+            <input type="file" accept="image/*,.heic,.heif" (change)="elegirImagen($event)">
+          </label>
+          <small *ngIf="!procesandoImagen">Cualquier foto (también de iPhone). Se quita la ubicación GPS y se ajusta el tamaño.</small>
+          <small *ngIf="procesandoImagen">Preparando la foto...</small>
+        </div>
+      </div>
+
+      <label>Título (opcional):</label>
+      <input type="text" [(ngModel)]="titulo" name="titulo" maxlength="150" placeholder="Ej. Ana, 6 sesiones de reductivos">
+
+      <label>Descripción (opcional):</label>
+      <textarea [(ngModel)]="descripcion" name="descripcion" maxlength="500" rows="4"
+                placeholder="Ej. Resultado después de 6 sesiones"></textarea>
+      <small class="contador">{{ descripcion.length }}/500</small>
+
+      <p class="casos-error" *ngIf="error">{{ error }}</p>
+
+      <div class="casos-botones">
+        <button type="submit" class="btn-guardar" [disabled]="procesandoImagen || guardando">
+          {{ guardando ? 'Guardando...' : (editando ? 'Actualizar' : 'Guardar') }}
+        </button>
+        <button type="button" class="btn-cancelar" (click)="cerrarFormulario()">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>

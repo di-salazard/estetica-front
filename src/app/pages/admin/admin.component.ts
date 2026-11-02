@@ -7,6 +7,7 @@ import { Servicio } from '../../core/models/servicio.model';
 import { ServicioDetalle } from '../../core/models/servicio-detalle.model';
 import { FormatoMilesDirective } from '../../shared/format/formato-miles.directive';
 import { urlImagen, prepararImagen, TAMANO_MAXIMO } from '../../core/utils/imagen';
+import { CasosRealesAdminComponent } from './casos-reales-admin/casos-reales-admin.component';
 
 // Importaciones PURAS de FullCalendar (Sin el wrapper de Angular)
 // Bypass para ignorar el falso error de módulo de FullCalendar
@@ -22,7 +23,7 @@ import esLocale from '@fullcalendar/core/locales/es';
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule, FormatoMilesDirective],
+  imports: [CommonModule, FormsModule, FormatoMilesDirective, CasosRealesAdminComponent],
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.scss']
 })

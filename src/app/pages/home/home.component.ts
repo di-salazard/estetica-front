@@ -4,12 +4,13 @@ import { ProductCardComponent } from '../../shared/product-card/product-card.com
 import { EsteticaService } from '../../core/services/estetica.service';
 import { Servicio } from '../../core/models/servicio.model';
 import { ConfirmModalComponent } from '../../shared/confirm-modal/confirm-modal.component'; // <-- 1. Import de la clase
+import { CasosRealesComponent } from '../../shared/casos-reales/casos-reales.component';
 
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, ProductCardComponent,ConfirmModalComponent], 
+  imports: [CommonModule, ProductCardComponent, ConfirmModalComponent, CasosRealesComponent],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'] // o .scss
 })
