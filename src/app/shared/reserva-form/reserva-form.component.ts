@@ -145,6 +145,9 @@ export class ReservaFormComponent implements OnInit {
           this.cargarHoras();
         } else if (err.status === 400) {
           this.errorEnvio = 'Revisa tus datos: faltan campos o la hora no es válida.';
+        } else if (err.status === 429) {
+          // Límite de reservas por hora del backend
+          this.errorEnvio = err.error?.error || 'Has hecho demasiadas reservas seguidas. Intenta más tarde o contáctanos directamente.';
         } else {
           this.errorEnvio = 'No pudimos guardar tu reserva. Intenta de nuevo en unos minutos.';
         }

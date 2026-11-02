@@ -18,7 +18,9 @@
             {{ errorMessage }}
         </div>
 
-        <button type="submit" class="btn-login">Ingresar al Panel</button>
+        <button type="submit" class="btn-login" [disabled]="segundosBloqueo > 0">
+          {{ segundosBloqueo > 0 ? 'Espera ' + segundosBloqueo + ' s' : 'Ingresar al Panel' }}
+        </button>
     </form>
   </div>
 </div>
