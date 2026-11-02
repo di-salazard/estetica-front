@@ -1,0 +1,28 @@
+<button class="boton-casos" *ngIf="testimonios.length > 0 && !abierto" (click)="abrir()" aria-label="Ver casos reales">
+  <i class="fas fa-images"></i>
+  <span>Casos reales</span>
+</button>
+
+<div class="galeria-overlay" *ngIf="abierto && foto" (click)="cerrar()">
+  <div class="galeria" (click)="$event.stopPropagation()">
+    <button class="galeria-cerrar" (click)="cerrar()" aria-label="Cerrar">✕</button>
+    <h3>Casos reales</h3>
+    <p class="galeria-subtitulo">Resultados de clientas que ya nos visitaron</p>
+
+    <div class="galeria-foto" (touchstart)="toqueInicio($event)" (touchend)="toqueFin($event)">
+      <button class="galeria-flecha izquierda" *ngIf="testimonios.length > 1" (click)="ver(actual - 1)" aria-label="Anterior">‹</button>
+      <img [src]="url(foto)" [alt]="foto.titulo || 'Caso real'">
+      <button class="galeria-flecha derecha" *ngIf="testimonios.length > 1" (click)="ver(actual + 1)" aria-label="Siguiente">›</button>
+    </div>
+
+    <div class="galeria-texto" *ngIf="foto.titulo || foto.descripcion">
+      <h4 *ngIf="foto.titulo">{{ foto.titulo }}</h4>
+      <p *ngIf="foto.descripcion">{{ foto.descripcion }}</p>
+    </div>
+
+    <div class="galeria-miniaturas" *ngIf="testimonios.length > 1">
+      <img *ngFor="let t of testimonios; let i = index" [src]="url(t)" [alt]="t.titulo || 'Caso real'"
+           [class.activa]="i === actual" (click)="ver(i)" loading="lazy">
+    </div>
+  </div>
+</div>

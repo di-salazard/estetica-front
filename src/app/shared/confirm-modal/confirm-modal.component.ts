@@ -1,12 +1,12 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
 import { Servicio } from '../../core/models/servicio.model';
+import { ReservaFormComponent } from '../reserva-form/reserva-form.component';
 
 @Component({
   selector: 'app-confirm-modal',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ReservaFormComponent],
   templateUrl: './confirm-modal.component.html',
   styleUrls: ['./confirm-modal.component.scss']
 })
@@ -16,8 +16,8 @@ export class ConfirmModalComponent {
   @Output() cerrarModal = new EventEmitter<void>();
 
   paqueteSeleccionado: any = null;
-
-  constructor(private router: Router) {}
+  // 'paquete': elegir paquete; 'reserva': elegir día, hora y datos para ese paquete
+  paso: 'paquete' | 'reserva' = 'paquete';
 
   ngOnChanges() {
     console.log('servicio recibido en el Modal:', this.servicio);
@@ -39,9 +39,7 @@ export class ConfirmModalComponent {
 
   continuarAReserva() {
     if (this.paqueteSeleccionado) {
-      console.log('Continuando reserva para:', this.servicio?.titulo, 'Paquete:', this.paqueteSeleccionado);
-      this.cerrarModal.emit(); // Cierra el modal
-      this.router.navigate(['/reserva']); // Redirige al calendario
+      this.paso = 'reserva';
     }
   }
 }

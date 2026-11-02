@@ -196,3 +196,45 @@
   font-size: 11px;
   color: #777;
 }
+/* Tablet: 2 columnas. Celular: 1 columna centrada */
+@media (max-width: 900px) {
+  .footer-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+    padding: 0 24px;
+  }
+}
+
+@media (max-width: 560px) {
+  .footer-container {
+    grid-template-columns: 1fr;
+    padding: 0 20px;
+    text-align: center;
+  }
+
+  .footer-logo {
+    margin: 0 auto;
+  }
+
+  /* Contacto: bloque centrado, pero con el texto alineado junto a su ícono */
+  .contact p {
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+  }
+
+  .social-icons,
+  .subscribe-form {
+    justify-content: center;
+  }
+
+  .hours ul {
+    display: inline-block;
+    text-align: left;
+  }
+
+  .footer-bottom {
+    padding: 0 20px;
+  }
+}

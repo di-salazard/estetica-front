@@ -4,12 +4,13 @@ import { ProductCardComponent } from '../../shared/product-card/product-card.com
 import { EsteticaService } from '../../core/services/estetica.service';
 import { Servicio } from '../../core/models/servicio.model';
 import { ConfirmModalComponent } from '../../shared/confirm-modal/confirm-modal.component'; // <-- 1. Import de la clase
+import { CasosRealesComponent } from '../../shared/casos-reales/casos-reales.component';
 
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, ProductCardComponent,ConfirmModalComponent], 
+  imports: [CommonModule, ProductCardComponent, ConfirmModalComponent, CasosRealesComponent],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'] // o .scss
 })
@@ -30,7 +31,8 @@ export class HomeComponent implements OnInit{
       next: (data) => {
         // 3. Guardamos los datos y FORZAMOS el dibujado
         console.log('Tratamientos obtenidos:', data);
-        this.listaTratamientos = data;
+        // Solo servicios activos (null cuenta como activo: servicios antiguos sin el campo)
+        this.listaTratamientos = (data || []).filter((s) => s.activo !== false);
         this.cdr.detectChanges(); // <--- ¡Esta es la línea mágica!
       },
       error: (error) => {

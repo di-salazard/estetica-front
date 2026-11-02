@@ -6,6 +6,8 @@ export interface Servicio {
 	descripcionBase?: string;
 	enOferta: boolean;
 	imagenUrl: string;
+	duracionMinutos?: number | null;
+	activo?: boolean | null; // null = activo (servicios antiguos)
 	detalles?: ServicioDetalle[];
 }
 

@@ -20,7 +20,13 @@
     "@angular/platform-server": "^22.0.0",
     "@angular/router": "^22.0.0",
     "@angular/ssr": "^22.0.6",
+    "@fullcalendar/core": "6.1.15",
+    "@fullcalendar/daygrid": "6.1.15",
+    "@fullcalendar/google-calendar": "6.1.15",
+    "@fullcalendar/interaction": "6.1.15",
+    "@fullcalendar/timegrid": "6.1.15",
     "express": "^5.1.0",
+    "heic2any": "0.0.4",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },

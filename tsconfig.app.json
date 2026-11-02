@@ -5,7 +5,11 @@
   "compilerOptions": {
     "types": [
       "node"
-    ]
+    ],
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
   },
   "include": [
     "src/**/*.ts"

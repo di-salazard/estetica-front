@@ -108,3 +108,17 @@
   left: 20px; 
   background: linear-gradient(to right, var(--color-oro-claro) 0%, var(--color-oro-medio) 30%, transparent 100%);
 }
+/* Celular: menos margen lateral y un logo algo más chico */
+@media (max-width: 600px) {
+  .main-nav {
+    padding: 12px 16px 8px;
+  }
+
+  .header-logo {
+    max-width: 80px;
+  }
+
+  .nav-icons {
+    gap: 16px;
+  }
+}

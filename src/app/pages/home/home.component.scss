@@ -55,3 +55,21 @@
   font-size: 11px;
   letter-spacing: 1.5px; /* Separar un poco las letras da un toque más "Premium" */
 }
+
+/* Celular y tablet */
+@media (max-width: 768px) {
+  .home-body {
+    padding: 30px 16px;
+  }
+
+  .section-header {
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 25px;
+  }
+
+  .catalog-grid {
+    grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
+    gap: 20px;
+  }
+}

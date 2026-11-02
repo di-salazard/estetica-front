@@ -1,0 +1,79 @@
+<!-- Reserva confirmada -->
+<section class="confirmacion" *ngIf="reservaConfirmada; else formularioReserva">
+  <i class="fas fa-check"></i>
+  <h2>¡Reserva confirmada!</h2>
+  <p>Te esperamos el <strong>{{ fechaLegible | lowercase }}</strong> a las <strong>{{ horaSeleccionada }}</strong>.</p>
+  <p>{{ servicio.titulo }} · {{ paquete.nombrePaquete }}</p>
+  <p class="nota">Si necesitas cambiar tu hora, contáctanos por WhatsApp.</p>
+  <button type="button" class="btn-oro" (click)="cerrar.emit()">Listo</button>
+</section>
+
+<ng-template #formularioReserva>
+  <button type="button" class="btn-volver" (click)="volver.emit()">← Cambiar paquete</button>
+
+  <h2>{{ servicio.titulo }}</h2>
+  <div class="resumen">
+    <span>{{ paquete.nombrePaquete }} · {{ duracionMinutos }} min</span>
+    <strong>
+      <s *ngIf="paquete.enOferta && paquete.precioOferta > 0">${{ paquete.precio.toLocaleString('es-CL') }}</s>
+      ${{ precioPaquete.toLocaleString('es-CL') }}
+    </strong>
+  </div>
+
+  <!-- Calendario a la izquierda, horas disponibles del día elegido a la derecha -->
+  <div class="agenda">
+    <div class="calendario">
+      <div class="calendario-header">
+        <button type="button" (click)="cambiarMes(-1)" [disabled]="!puedeRetroceder" aria-label="Mes anterior">‹</button>
+        <span>{{ nombreMes }}</span>
+        <button type="button" (click)="cambiarMes(1)" [disabled]="!puedeAvanzar" aria-label="Mes siguiente">›</button>
+      </div>
+      <div class="calendario-grid">
+        <span class="dia-semana" *ngFor="let d of diasSemana">{{ d }}</span>
+        <ng-container *ngFor="let c of celdas">
+          <span *ngIf="!c"></span>
+          <button type="button" *ngIf="c" class="dia"
+            [class.activo]="c.fecha === fechaSeleccionada"
+            [disabled]="!c.habilitado"
+            (click)="seleccionarDia(c.fecha)">
+            {{ c.dia }}
+          </button>
+        </ng-container>
+      </div>
+    </div>
+
+    <div class="horas-panel">
+      <h3>{{ fechaSeleccionada ? fechaLegible : 'Horas disponibles' }}</h3>
+      <p class="aviso" *ngIf="!fechaSeleccionada">Elige un día en el calendario para ver las horas disponibles.</p>
+      <p class="aviso" *ngIf="cargandoHoras">Buscando horas disponibles...</p>
+      <p class="aviso error" *ngIf="errorHoras">{{ errorHoras }}</p>
+      <p class="aviso" *ngIf="fechaSeleccionada && !cargandoHoras && !errorHoras && horas.length === 0">
+        No quedan horas disponibles este día. Prueba con otro.
+      </p>
+      <div class="horas" *ngIf="!cargandoHoras && horas.length > 0">
+        <button type="button" *ngFor="let h of horas" class="hora"
+          [class.activo]="h === horaSeleccionada"
+          (click)="horaSeleccionada = h">
+          {{ h }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Datos -->
+  <form *ngIf="horaSeleccionada" #datosForm="ngForm" (ngSubmit)="confirmarReserva()" class="campos">
+    <h3>Tus datos</h3>
+    <input type="text" [(ngModel)]="cliente.nombre" name="nombre" required minlength="3" placeholder="Nombre y apellido">
+    <input type="email" [(ngModel)]="cliente.correo" name="correo" required email placeholder="Correo">
+    <div class="telefono">
+      <span>+56</span>
+      <input type="tel" [(ngModel)]="cliente.telefono" name="telefono" required pattern="^9[\s]?\d{4}[\s]?\d{4}$" placeholder="9 1234 5678 (WhatsApp)">
+    </div>
+
+    <p class="aviso error" *ngIf="errorEnvio">{{ errorEnvio }}</p>
+
+    <button type="submit" class="btn-oro" [disabled]="datosForm.invalid || enviando">
+      {{ enviando ? 'Reservando...' : 'Confirmar reserva · ' + fechaLegible + ' ' + horaSeleccionada }}
+    </button>
+  </form>
+</ng-template>
