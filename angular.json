@@ -35,7 +35,7 @@
             "styles": [
               "src/styles.scss"
             ],
-            "baseHref": "https://di-salazard.github.io/estetica-front/",
+            "baseHref": "",
             "allowedCommonJsDependencies": [
               "@fullcalendar/core",
               "@fullcalendar/angular",
@@ -59,7 +59,8 @@
                   "maximumError": "8kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "baseHref": "https://di-salazard.github.io/estetica-front/"
             },
             "development": {
               "optimization": false,
